@@ -94,6 +94,9 @@ const styles = (theme:Theme):Record<string, React.CSSProperties> => ({
 })
 @(withStyles as any)(styles)
 class DateModal extends React.Component<DateModalProps, DateModalState> {
+  
+ 
+
   constructor(props) {
     super(props)
     const now = new Date()
@@ -216,8 +219,8 @@ class DateModal extends React.Component<DateModalProps, DateModalState> {
       month: index % 12
     }
     const firstDay = new Date(calendarFocus.year, calendarFocus.month, 1)
-    const daysInWeekInMonth:Date[][] = [Array.apply(undefined, {length:firstDay.getDay()})]
-    var counter = firstDay.getDay()
+    const daysInWeekInMonth:Date[][] = [Array.apply(undefined, {length:this.props.dateFormat.weekMapping[firstDay.getDay()]})]
+    var counter = this.props.dateFormat.weekMapping[firstDay.getDay()] 
     for(var day = firstDay; day.getMonth() === calendarFocus.month; day = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1)) {
       if(!daysInWeekInMonth[Math.floor(counter / 7)]) {
         daysInWeekInMonth[Math.floor(counter / 7)] = [new Date(day.getFullYear(), day.getMonth(), day.getDate())]
@@ -249,12 +252,12 @@ class DateModal extends React.Component<DateModalProps, DateModalState> {
                   <div className={classes.calendarControl}>
                     <IconButton disabled={!this.previousMonthValid()} onClick={this.previousMonth}><ChevronLeftIcon/></IconButton>
                     <Button onClick={this.showYearsCalendar} className={classes.calendarMonthTitle}>
-                      {DateUtil.month[month].long + ', ' + year}
+                      {this.props.dateFormat.month[month].long + ', ' + year}
                     </Button>
                     <IconButton disabled={!this.nextMonthValid()} onClick={this.nextMonth}><ChevronRightIcon/></IconButton>
                   </div>
                   <div className={classes.week}>
-                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) =>
+                    {this.props.dateFormat.day.map((day)=>{return day.short.substring(0,1) }).map((day, index) =>
                       <Typography key={'weeklabel-' + index} className={classes.weekDay} variant='body1'>{day}</Typography>
                     )}
                   </div>
@@ -313,7 +316,8 @@ class DateModal extends React.Component<DateModalProps, DateModalState> {
 export interface DateModalProps extends React.Props<{}>, StyledComponentProps {
   value: Date
   onChange: (value:Date) => void
-  calendarShow: boolean
+  calendarShow: boolean;
+  dateFormat? : DateUtil.DateFormat;
   min?: Date
   max?: Date
 }

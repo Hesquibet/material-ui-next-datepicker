@@ -39,6 +39,11 @@ const styles = (theme:Theme):Record<string, React.CSSProperties> => ({
 class DateFormatInput extends React.Component<DateFormatInputProps, DateFormatInputState> {
   input:Element
   dateModal:Element
+
+  public static defaultProps: Partial<DateFormatInputProps> = {
+    dateFormat : {day : DateUtil.day, month : DateUtil.month,weekMapping:{0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7}, format : (date :Date, format :string)=>{ return DateUtil.format(date,format, DateUtil.day,DateUtil.month)}}
+  }
+
   constructor(props) {
     super(props)
     const now = new Date()
@@ -74,13 +79,13 @@ class DateFormatInput extends React.Component<DateFormatInputProps, DateFormatIn
     this.setState({calendarShow:!calendarShow})
   }
   render() {
-    const {name, label, value, onChange, error, fullWidth, min, max, classes} = this.props
+    const {name, label, value, onChange, error, fullWidth, min, max, classes, dateFormat} = this.props
     const {focus, calendarShow} = this.state
     return (
       <Manager>
         <Target><div ref={input => this.input = ReactDOM.findDOMNode(input)}><FormControl className={classes.formControl} onClick={this.toggleShowCalendar} error={error !== undefined} fullWidth>
           {label && <InputLabel shrink={focus || calendarShow || value !== undefined} classes={{root:classes.label}} htmlFor={name}>{label}</InputLabel>}
-          <Input name={name} value={value? DateUtil.format(value, 'EEE, MMMM d, yyyy'):'\u00a0'}
+          <Input name={name} value={value?this.props.dateFormat.format(value,'EEE, MMMM d, yyyy'):'\u00a0'}
             onFocus={() => this.onFocus(true)}
             onBlur={() => this.onFocus(false)}
             inputComponent={({value}) => <div className={classes.input}>{value}</div>}
@@ -94,7 +99,7 @@ class DateFormatInput extends React.Component<DateFormatInputProps, DateFormatIn
         </FormControl></div></Target>
         <Portal>
           <Popper placement='bottom-start'>
-            <DateModal ref={dateModal => this.dateModal = ReactDOM.findDOMNode(dateModal)} value={value} onChange={onChange} min={min} max={max} calendarShow={calendarShow}/>
+            <DateModal ref={dateModal => this.dateModal = ReactDOM.findDOMNode(dateModal)} dateFormat={dateFormat} value={value} onChange={onChange} min={min} max={max} calendarShow={calendarShow}/>
           </Popper>
         </Portal>
       </Manager>
@@ -106,6 +111,7 @@ export interface DateFormatInputProps extends React.Props<{}>, StyledComponentPr
   label?: string
   value: Date
   onChange: (value:Date) => void
+  dateFormat? : DateUtil.DateFormat
   error?: string
   min?: Date
   max?: Date

@@ -4,6 +4,19 @@ const fillInDigit = (number:number, digit:number) => {
   while(clean.length < digit) clean = '0' + clean
   return clean
 }
+export type DateShortLongTranslation={
+  short:string,
+  long : string
+}
+export type weekMapping={[index : number] :number}
+
+export type DateFormat={
+  month : Array<DateShortLongTranslation>,
+  day : Array<DateShortLongTranslation>,
+  format :(date:Date,format: string)=>string,
+  weekMapping : weekMapping
+}
+
 export const month = [{
   short: 'Jan',
   long: 'January'
@@ -63,7 +76,7 @@ export const day = [{
     short: 'Sat',
     long: 'Saturday'
 }]
-export const format = (date:Date, format:string) =>
+export const format = (date:Date, format:string,day :  Array<DateShortLongTranslation>, month :  Array<DateShortLongTranslation>) =>
   [[{
     keyword: 'dd',
     word: fillInDigit(date.getDate(), 2)
